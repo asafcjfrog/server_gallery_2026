@@ -22,6 +22,8 @@ jobs:
       matrix:
         branch: [ "main" ]
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
       - uses: jfrog/frogbot@v3
         env:
           JF_URL: ${{ secrets.JF_URL }}
