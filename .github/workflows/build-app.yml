@@ -1,0 +1,56 @@
+name: JFrog Security Demo App Builder
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  BUILD_NAME: "JFrog Security Demo App Builder"
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JFrog CLI
+        uses: jfrog/setup-jfrog-cli@v4
+        env:
+          JF_URL: ${{ secrets.JF_URL }}
+          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+
+      - name: Set Docker Registry Domain
+        run: |
+          # Strip 'https://' or 'http://' and any subpath from JF_URL for Docker image tags
+          REGISTRY_HOST=$(echo "${{ secrets.JF_URL }}" | sed -e 's|^https\?://||' -e 's|/.*$||')
+          echo "DOCKER_REGISTRY=$REGISTRY_HOST" >> $GITHUB_ENV
+          echo "IMAGE_NAME=$REGISTRY_HOST/gartner-docker/jfrog/npm-demo:${{ github.run_number }}" >> $GITHUB_ENV
+
+      - name: Pull base image
+        run: |
+          jf docker pull ${{ env.DOCKER_REGISTRY }}/gartner-docker/jfrog/demo-security:latest
+
+      - name: Build Docker image
+        run: |
+          jf docker build -t ${{ env.IMAGE_NAME }} .
+
+      - name: Push Docker image to Artifactory
+        run: |
+          jf docker push ${{ env.IMAGE_NAME }} --build-name="${{ env.BUILD_NAME }}" --build-number="${{ github.run_number }}"
+
+      - name: Collect build metadata
+        run: |
+          jf rt build-collect-env "${{ env.BUILD_NAME }}" ${{ github.run_number }}
+          jf rt build-add-git "${{ env.BUILD_NAME }}" ${{ github.run_number }}
+
+      - name: Publish build info
+        run: |
+          jf rt build-publish "${{ env.BUILD_NAME }}" ${{ github.run_number }}
+
+      - name: Scan build with Xray
+        run: |
+          jf build-scan "${{ env.BUILD_NAME }}" ${{ github.run_number }} --fail
