@@ -21,7 +21,7 @@ jobs:
         uses: jfrog/setup-jfrog-cli@v4
         env:
           JF_URL: ${{ secrets.JF_URL }}
-          JF_PASSWORD: ${{ secrets.JF_ACCESS_TOKEN }}
+          JF_PASSWORD: ${{ secrets.JF_PASSWORD }}
           JF_USER: ${{ secrets.JF_USER }}
 
       - name: Set Docker Registry Domain
