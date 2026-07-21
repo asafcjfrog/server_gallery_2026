@@ -56,6 +56,10 @@ jobs:
         run: |
           jf rt build-publish "${{ env.BUILD_NAME }}" ${{ github.run_number }}
 
+      - name: Scan docker with Xray
+        run: |
+          jf docker scan ${{ env.IMAGE_NAME }}
+          
       - name: Scan build with Xray
         run: |
           jf build-scan "${{ env.BUILD_NAME }}" ${{ github.run_number }} --fail
