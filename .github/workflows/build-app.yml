@@ -59,6 +59,7 @@ jobs:
       - name: Scan docker with Xray
         run: |
           jf docker scan ${{ env.IMAGE_NAME }}
+          sleep 20
           
       - name: Scan build with Xray
         run: |
