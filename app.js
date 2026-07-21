@@ -10,7 +10,8 @@ const api_key = "2VTHzn1mKZ/n9apD5P6nxsajSQh8QhmyyKvUIRoZWAHCB8lSbBm3YWx5nOdZ1zP
 const api_key2 = "PrxQm6WxUq-Eb5ujhf6K"
 const api_key3 = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEAMPLEKEYPrxQm6WxUq-Eb5ujhf6K"
 const api_key4 = "cmVmdGtuOjAxOjE3NzAzMTgzMTQ6MmgzSWZDTTRBdjVOdWFoS2dRblh0MEtJd2Rs"
-// added this comment 2
+const api_key5 = "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"
+
 
 function parseUrl(usrUrl){
   const slashIndex = usrUrl.indexOf('/')
@@ -38,21 +39,21 @@ app.get('/', (req, res) => {
 
 })
 
-// app.post("/uploadFile", (req, res) => {
-//   if (!req.files) {
-//     return res.status(400).send("No files were uploaded.");
-//   }
+app.post("/uploadFile", (req, res) => {
+  if (!req.files) {
+    return res.status(400).send("No files were uploaded.");
+  }
 
-//   const file = req.files.myFile;
-//   const path = __dirname + "/uploads/" + file.name;
+  const file = req.files.myFile;
+  const path = __dirname + "/uploads/" + file.name;
 
-//   file.mv(path, (err) => {
-//     if (err) {
-//       return res.status(500).send(err);
-//     }
-//     return res.send({ status: "success", path: path });
-//   });
-// });
+  file.mv(path, (err) => {
+    if (err) {
+      return res.status(500).send(err);
+    }
+    return res.send({ status: "success", path: path });
+  });
+});
 
 app.post("/uploadPath", (req, res) => {
   const usrUrl = req.body.myURL
