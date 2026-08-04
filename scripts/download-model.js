@@ -14,7 +14,10 @@ const path = require('path');
 // already cached and skip re-downloading.
 
 const MODEL_ID = 'Xenova/flan-t5-small';
-const REMOTE_HOST = 'https://huggingface.co';
+// Defaults to the public Hub; in CI this is overridden to Artifactory's
+// huggingfaceml remote repo so the download is attributed to a recognized
+// Hugging Face package source (see Dockerfile HF_ENDPOINT build-arg).
+const REMOTE_HOST = process.env.HF_ENDPOINT || 'https://huggingface.co';
 const FILES = [
   'config.json',
   'generation_config.json',
@@ -28,13 +31,19 @@ const FILES = [
 
 const cacheDir = path.join(__dirname, '..', 'models-cache', MODEL_ID);
 
+const authHeaders = {};
+if (process.env.JF_USER && process.env.JF_PASSWORD) {
+  const basic = Buffer.from(`${process.env.JF_USER}:${process.env.JF_PASSWORD}`).toString('base64');
+  authHeaders.Authorization = `Basic ${basic}`;
+}
+
 async function downloadFile(filename) {
   const url = `${REMOTE_HOST}/${MODEL_ID}/resolve/main/${filename}`;
   const destPath = path.join(cacheDir, filename);
   fs.mkdirSync(path.dirname(destPath), { recursive: true });
 
   console.log(`Downloading ${url}`);
-  const response = await fetch(url);
+  const response = await fetch(url, { headers: authHeaders });
   if (!response.ok) {
     throw new Error(`Failed to download ${url}: ${response.status} ${response.statusText}`);
   }
