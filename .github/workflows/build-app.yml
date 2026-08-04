@@ -42,13 +42,11 @@ jobs:
       - name: Build Docker image
         env:
           DOCKER_BUILDKIT: "1"
-          JF_USER: ${{ secrets.JF_USER }}
-          JF_PASSWORD: ${{ secrets.JF_PASSWORD }}
+          HF_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
         run: |
           jf docker build -t ${{ env.IMAGE_NAME }} \
             --build-arg HF_ENDPOINT=https://${{ env.DOCKER_REGISTRY }}/artifactory/api/huggingfaceml/asafc-hugging-face-remote \
-            --secret id=jf_user,env=JF_USER \
-            --secret id=jf_password,env=JF_PASSWORD \
+            --secret id=hf_token,env=HF_TOKEN \
             .
 
       - name: Push Docker image to Artifactory
