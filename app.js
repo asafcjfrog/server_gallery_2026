@@ -3,8 +3,19 @@ const fileUpload = require('express-fileupload');
 const undici = require('undici')
 const path = require('path')
 const fs = require('fs');
+const { pipeline, env } = require('@huggingface/transformers');
 const app = express()
 const port = 8080
+
+env.cacheDir = path.join(__dirname, 'models-cache');
+
+let generatorPromise = null;
+function getGenerator() {
+  if (!generatorPromise) {
+    generatorPromise = pipeline('text2text-generation', 'Xenova/flan-t5-small');
+  }
+  return generatorPromise;
+}
 const api_key = "2VTHzn1mKZ/n9apD5P6nxsajSQh8QhmyyKvUIRoZWAHCB8lSbBm3YWx5nOdZ1zPEOaA0zIZy1eFgHgfB2HkfAdVrbQj19kagXDVe"
 const api_key3 = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEAMPLEKEYPrxQm6WxUq-Eb5ujhf6K"
 const api_key4 = "cmVmdGtuOjAxOjE3NzAzMTgzMTQ6MmgzSWZDTTRBdjVOdWFoS2dRblh0MEtJd2Rs"
@@ -28,6 +39,7 @@ function makeid(length) {
   return result;
 }
 
+app.use(express.json());
 app.use(fileUpload({parseNested: false}));
 
 app.get('/', (req, res) => {
@@ -57,6 +69,21 @@ app.post("/uploadPath", (req, res) => {
   
   return res.send({ status: "success", path: path });
   
+})
+
+app.post("/generate", async (req, res) => {
+  const prompt = req.body.prompt
+  if (!prompt) {
+    return res.status(400).send({ status: "error", message: "prompt is required" });
+  }
+
+  try {
+    const generator = await getGenerator();
+    const output = await generator(prompt);
+    return res.send({ status: "success", output });
+  } catch (err) {
+    return res.status(500).send({ status: "error", message: err.message });
+  }
 })
 
 app.listen(port, () => {
