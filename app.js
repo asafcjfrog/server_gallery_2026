@@ -3,6 +3,11 @@ const fileUpload = require('express-fileupload');
 const undici = require('undici')
 const path = require('path')
 const fs = require('fs');
+
+// Alpine (musl) can't load the glibc-linked onnxruntime-node native binding,
+// so force the pure-WASM onnxruntime-web backend instead.
+globalThis[Symbol.for('onnxruntime')] = require('onnxruntime-web');
+
 const { pipeline, env } = require('@huggingface/transformers');
 const app = express()
 const port = 8080

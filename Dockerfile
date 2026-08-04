@@ -1,9 +1,12 @@
 # Use the base image from Artifactory
 FROM productdemo.jfrog.io/gartner-docker/jfrog/demo-security:latest
 
-# Install Node.js and npm, plus gcompat so the glibc-linked onnxruntime-node
-# native binding (used to run the flan-t5-small model) works on musl/Alpine
-RUN apk add --no-cache nodejs npm gcompat libstdc++
+# Install Node.js and npm. The base image's own Alpine repo (v3.15) only has
+# Node 16, which is too old for @huggingface/transformers (needs Node >=18 for
+# global fetch/structuredClone), so pull pinned versions from a newer Alpine repo.
+RUN apk add --no-cache 'nodejs=20.15.1-r0' 'npm=10.2.5-r0' \
+    --repository=https://dl-cdn.alpinelinux.org/alpine/v3.19/main \
+    --repository=https://dl-cdn.alpinelinux.org/alpine/v3.19/community
 
 # Set the working directory
 WORKDIR /app
