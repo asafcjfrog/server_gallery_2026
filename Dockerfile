@@ -13,6 +13,10 @@ ENV HF_ENDPOINT=$HF_ENDPOINT
 # file from the Hub) can be slow, so give the client plenty of headroom.
 ENV HF_HUB_ETAG_TIMEOUT=86400
 ENV HF_HUB_DOWNLOAD_TIMEOUT=86400
+# huggingface_hub defaults to the newer Xet transfer protocol, which needs a
+# xet-read-token API Artifactory's huggingfaceml proxy doesn't implement
+# (404s). Force the classic resolve/<revision>/<file> HTTP path instead.
+ENV HF_HUB_DISABLE_XET=1
 
 # Install Node.js/npm (for the app) and Python/pip (for huggingface_hub, the
 # only client Artifactory's huggingfaceml integration reliably recognizes —
