@@ -46,6 +46,8 @@ jobs:
         run: |
           jf docker build -t ${{ env.IMAGE_NAME }} \
             --build-arg HF_ENDPOINT=https://${{ env.DOCKER_REGISTRY }}/artifactory/api/huggingfaceml/asafc-hugging-face-remote \
+            --build-arg JF_URL=https://${{ env.DOCKER_REGISTRY }} \
+            --build-arg HF_REPO=asafc-hugging-face-remote \
             --secret id=hf_token,env=HF_TOKEN \
             .
 

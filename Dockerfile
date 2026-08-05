@@ -17,6 +17,17 @@ ENV HF_HUB_DOWNLOAD_TIMEOUT=86400
 # xet-read-token API Artifactory's huggingfaceml proxy doesn't implement
 # (404s). Force the classic resolve/<revision>/<file> HTTP path instead.
 ENV HF_HUB_DISABLE_XET=1
+ENV HF_HUB_ENABLE_HF_TRANSFER=0
+
+# Base Artifactory site URL and the huggingfaceml repo key (same values used
+# to build HF_ENDPOINT above), used only to fetch Artifactory's own
+# .jfrog_huggingface_model_info.json for this model out of the repo's cache
+# after download — this is what ties the baked-in files back to a cataloged
+# package for Xray/AI Catalog, since content hashes alone don't.
+ARG JF_URL=""
+ENV JF_URL=$JF_URL
+ARG HF_REPO=""
+ENV HF_REPO=$HF_REPO
 
 # Install Node.js/npm (for the app) and Python/pip (for huggingface_hub, the
 # only client Artifactory's huggingfaceml integration reliably recognizes —
