@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": ""
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -18,11 +18,15 @@
     "express-fileupload": "^1.1.8",
     "formidable": "^3.2.3",
     "jquery": "3.4",
+    "jsonwebtoken": "8.5.1",
     "lodash": "^4.17.0",
+    "minimist": "1.2.0",
     "node-forge": "^0.7.2",
     "parse-url": "^6.0.5",
     "undici": "5.8.0",
-    "vm2": "^3.9.3",
-    "minimist": "1.2.0"
+    "vm2": "^3.9.3"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }
