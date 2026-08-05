@@ -7,8 +7,9 @@ from pathlib import Path
 
 from huggingface_hub import snapshot_download
 
-MODEL_ID = "google/flan-t5-small"
-MODEL_DIR = Path(os.path.dirname(__file__)) / ".." / "models-cache" / MODEL_ID
+MODEL_ID = "moonshotai/Kimi-K3"
+CACHE_DIR = os.path.join(os.path.dirname(__file__), "..", "models-cache")
+MODEL_DIR = Path(CACHE_DIR) / MODEL_ID
 
 
 def write_model_manifest(model_dir: Path, model_id: str) -> None:
