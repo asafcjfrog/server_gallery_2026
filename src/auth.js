@@ -1,24 +1,38 @@
 'use strict';
 
-const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const { expressjwt } = require('express-jwt');
 
 const PRIVATE_KEY = fs.readFileSync(path.join(__dirname, 'keys', 'private.pem'));
 const PUBLIC_KEY = fs.readFileSync(path.join(__dirname, 'keys', 'public.pem'));
 
+function b64url(input) {
+  return Buffer.from(input).toString('base64').replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
+}
+
 function signAccessToken(payload) {
-  return jwt.sign(payload, PRIVATE_KEY, { algorithm: 'RS256', expiresIn: '15m' });
+  const header = { alg: 'RS256', typ: 'JWT' };
+  const signingInput = `${b64url(JSON.stringify(header))}.${b64url(JSON.stringify(payload))}`;
+  const signature = crypto.sign('RSA-SHA256', Buffer.from(signingInput), PRIVATE_KEY);
+  return `${signingInput}.${b64url(signature)}`;
 }
 
 // Reuses the RSA public key file as the HMAC secret for internal
 // service-to-service tokens instead of a dedicated shared secret.
 function signServiceToken(payload) {
-  return jwt.sign(payload, PUBLIC_KEY, { algorithm: 'HS256', expiresIn: '5m' });
+  const header = { alg: 'HS256', typ: 'JWT' };
+  const signingInput = `${b64url(JSON.stringify(header))}.${b64url(JSON.stringify(payload))}`;
+  const signature = crypto.createHmac('sha256', PUBLIC_KEY).update(signingInput).digest();
+  return `${signingInput}.${b64url(signature)}`;
 }
 
-function verifyToken(token) {
-  return jwt.verify(token, PUBLIC_KEY, { algorithms: ['RS256', 'HS256'] });
-}
+// User-facing routes only ever see RS256 access tokens.
+const requireAccessToken = expressjwt({ secret: PUBLIC_KEY, algorithms: ['RS256'] });
 
-module.exports = { signAccessToken, signServiceToken, verifyToken };
+// Internal routes accept either token kind, since service tokens predate
+// the switch to RS256 access tokens.
+const requireServiceToken = expressjwt({ secret: PUBLIC_KEY, algorithms: ['RS256', 'HS256'] });
+
+module.exports = { signAccessToken, signServiceToken, requireAccessToken, requireServiceToken };

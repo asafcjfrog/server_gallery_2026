@@ -9,6 +9,7 @@ const fs = require('fs');
 globalThis[Symbol.for('onnxruntime')] = require('onnxruntime-web');
 
 const { pipeline, env } = require('@huggingface/transformers');
+const { signAccessToken, signServiceToken, requireAccessToken, requireServiceToken } = require('./src/auth');
 const app = express()
 const port = 8080
 
@@ -91,6 +92,27 @@ app.post("/generate", async (req, res) => {
   }
 })
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+// Demo-only: mints both token kinds so the auth routes below can be
+// exercised without a full login flow.
+app.get('/auth/token', (req, res) => {
+  res.send({
+    accessToken: signAccessToken({ userId: 42 }),
+    serviceToken: signServiceToken({ service: 'billing' }),
+  });
 })
+
+app.get('/api/me', requireAccessToken, (req, res) => {
+  res.send({ status: 'success', auth: req.auth });
+})
+
+app.post('/internal/sync', requireServiceToken, (req, res) => {
+  res.send({ status: 'success', auth: req.auth });
+})
+
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+  })
+}
+
+module.exports = app;
