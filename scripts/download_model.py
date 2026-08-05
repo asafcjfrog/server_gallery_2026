@@ -2,7 +2,7 @@ import os
 
 from huggingface_hub import snapshot_download
 
-MODEL_ID = "google/flan-t5-small"
+MODEL_ID = "moonshotai/Kimi-K3"
 CACHE_DIR = os.path.join(os.path.dirname(__file__), "..", "models-cache")
 
 
