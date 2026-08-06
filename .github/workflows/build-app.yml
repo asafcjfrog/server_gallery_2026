@@ -33,11 +33,11 @@ jobs:
           # Strip 'https://' or 'http://' and any subpath from JF_URL for Docker image tags
           REGISTRY_HOST=$(echo "${{ secrets.JF_URL }}" | sed -e 's|^https\?://||' -e 's|/.*$||')
           echo "DOCKER_REGISTRY=$REGISTRY_HOST" >> $GITHUB_ENV
-          echo "IMAGE_NAME=$REGISTRY_HOST/asafc-forrester-docker-virtual/jfrog/npm-demo:${{ github.run_number }}" >> $GITHUB_ENV
+          echo "IMAGE_NAME=$REGISTRY_HOST/docker-forrester-ads-virtual/jfrog/npm-demo:${{ github.run_number }}" >> $GITHUB_ENV
 
       - name: Pull base image
         run: |
-          jf docker pull ${{ env.DOCKER_REGISTRY }}/asafc-forrester-docker-virtual/jfrog/demo-security:latest
+          jf docker pull ${{ env.DOCKER_REGISTRY }}/docker-forrester-ads-virtual/jfrog/demo-security:latest
 
       - name: Build Docker image
         env:
