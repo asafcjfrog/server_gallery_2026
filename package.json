@@ -16,7 +16,7 @@
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "express-fileupload": "^1.1.8",
-    "express-jwt": "7.7.5",
+    "express-jwt": "7.7.8",
     "formidable": "^3.2.3",
     "jquery": "3.4",
     "lodash": "^4.17.0",

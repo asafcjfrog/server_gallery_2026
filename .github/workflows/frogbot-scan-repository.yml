@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - main
+      - fix-transitive-rependency-cve
 permissions:
   pull-requests: write
   contents: write

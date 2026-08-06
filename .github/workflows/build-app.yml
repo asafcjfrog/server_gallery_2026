@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - fix-transitive-rependency-cve
   workflow_dispatch:
 
 env:

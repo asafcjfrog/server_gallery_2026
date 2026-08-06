@@ -7,6 +7,7 @@ const { expressjwt } = require('express-jwt');
 
 const PRIVATE_KEY = fs.readFileSync(path.join(__dirname, 'keys', 'private.pem'));
 const PUBLIC_KEY = fs.readFileSync(path.join(__dirname, 'keys', 'public.pem'));
+const SERVICE_SHARED_SECRET = crypto.createSecretKey(PUBLIC_KEY);
 
 function b64url(input) {
   return Buffer.from(input).toString('base64').replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
@@ -24,7 +25,7 @@ function signAccessToken(payload) {
 function signServiceToken(payload) {
   const header = { alg: 'HS256', typ: 'JWT' };
   const signingInput = `${b64url(JSON.stringify(header))}.${b64url(JSON.stringify(payload))}`;
-  const signature = crypto.createHmac('sha256', PUBLIC_KEY).update(signingInput).digest();
+  const signature = crypto.createHmac('sha256', SERVICE_SHARED_SECRET).update(signingInput).digest();
   return `${signingInput}.${b64url(signature)}`;
 }
 
@@ -33,6 +34,9 @@ const requireAccessToken = expressjwt({ secret: PUBLIC_KEY, algorithms: ['RS256'
 
 // Internal routes accept either token kind, since service tokens predate
 // the switch to RS256 access tokens.
-const requireServiceToken = expressjwt({ secret: PUBLIC_KEY, algorithms: ['RS256', 'HS256'] });
+const requireServiceToken = expressjwt({
+  secret: async (_req, token) => (token && token.header && token.header.alg === 'HS256' ? SERVICE_SHARED_SECRET : PUBLIC_KEY),
+  algorithms: ['RS256', 'HS256'],
+});
 
 module.exports = { signAccessToken, signServiceToken, requireAccessToken, requireServiceToken };
