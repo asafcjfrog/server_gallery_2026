@@ -21,7 +21,7 @@ jobs:
     name: Scan Repository (${{ matrix.branch }} branch)
     strategy:
       matrix:
-        branch: [ "main" ]
+        branch: [ "fix-transitive-rependency-cve" ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
