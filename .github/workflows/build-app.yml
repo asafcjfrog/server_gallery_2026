@@ -66,7 +66,7 @@ jobs:
 
       - name: Create Release Bundle
         run: |
-          jf release-bundle-create "${{ env.BUILD_NAME }}" "${{ github.run_number }}" \
+          jf release-bundle-create "jfs-server-gallery-demo" "${{ github.run_number }}" \
             --source-type-builds="name=${{ env.BUILD_NAME }}, id=${{ github.run_number }}"
           
       - name: Scan build with Xray
