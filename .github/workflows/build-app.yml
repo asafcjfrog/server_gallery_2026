@@ -63,6 +63,11 @@ jobs:
       - name: Publish build info
         run: |
           jf rt build-publish "${{ env.BUILD_NAME }}" ${{ github.run_number }}
+
+      - name: Create Release Bundle
+        run: |
+          jf release-bundle-create "${{ env.BUILD_NAME }}" "${{ github.run_number }}" \
+            --source-type-builds="name=${{ env.BUILD_NAME }}, id=${{ github.run_number }}"
           
       - name: Scan build with Xray
         run: |
