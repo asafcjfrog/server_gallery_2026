@@ -24,7 +24,7 @@
     "node-forge": "^0.7.2",
     "parse-url": "^6.0.5",
     "undici": "5.8.0",
-    "vm2": "^3.9.3"
+    "vm2": "3.11.8"
   },
   "devDependencies": {
     "jest": "^29.7.0"
